@@ -1,0 +1,30 @@
+{
+	"name" : "Wabel/zoho-crm-sync",
+	"description" : "This package contains code to help you synchronize ZohoCRM records with your database. ",
+	"type" : "library",
+	"homepage" : "http://mouf-php.com",
+	"keywords" : [
+		"ZohoCRM",
+		"Zoho",
+		"ORM",
+		"Sync"
+	],
+	"require" : {
+		"php" : ">=5.4",
+		"Wabel/zoho-crm-orm": "~1.0"
+	},
+  "require-dev" : {
+	  "phpunit/phpunit": "~4.0",
+	  "satooshi/php-coveralls": "dev-master"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"Wabel\\Zoho\\CRM\\Sync\\" : "src"
+		}
+	},
+    "autoload-dev" : {
+  	    "psr-4" : {
+		    "Wabel\\Zoho\\CRM\\Sync\\" : "tests"
+	    }
+    }
+}
