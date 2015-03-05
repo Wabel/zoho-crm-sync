@@ -26,5 +26,7 @@
   	    "psr-4" : {
 		    "Wabel\\Zoho\\CRM\\Sync\\" : "tests"
 	    }
-    }
+    },
+  	"minimum-stability": "dev",
+    "prefer-stable": true
 }
