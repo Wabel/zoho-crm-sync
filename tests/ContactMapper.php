@@ -1,12 +1,12 @@
 <?php
 namespace Wabel\Zoho\CRM\Sync;
 
-
 use TestNamespace\Contact;
 use Wabel\Zoho\CRM\Exception\ZohoCRMException;
 use Wabel\Zoho\CRM\ZohoBeanInterface;
 
-class ContactMapper implements MappingInterface {
+class ContactMapper implements MappingInterface
+{
 
     private $testContacts;
 
@@ -26,13 +26,10 @@ class ContactMapper implements MappingInterface {
         $this->testContacts = $testContacts;
     }
 
-
-
-
     /**
      * Returns a Zoho Bean based on the bean passed in argument
      *
-     * @param object $applicationBean
+     * @param  object            $applicationBean
      * @return ZohoBeanInterface
      */
     public function toZohoBean($applicationBean)
@@ -56,7 +53,7 @@ class ContactMapper implements MappingInterface {
     /**
      * Returns a Zoho Bean based on the bean passed in argument
      *
-     * @param ZohoBeanInterface $zohoBean
+     * @param  ZohoBeanInterface $zohoBean
      * @return object
      */
     public function toApplicationBean(ZohoBeanInterface $zohoBean)
@@ -93,7 +90,6 @@ class ContactMapper implements MappingInterface {
     /**
      * Returns an array of application beans that have been modified since the last synchronisation with Zoho.
      *
-     * @param \DateTime $lastSynchronisationDate The date the last synchronisation occured.
      * @return \object[]
      */
     public function getBeansToSynchronize()
@@ -105,7 +101,7 @@ class ContactMapper implements MappingInterface {
      * Filters the list of Zoho beans to store in database.
      *
      *
-     * @param array $zohoBeans
+     * @param  array $zohoBeans
      * @return array The filtered list of Zoho beans.
      */
     public function filterZohoBeans(array $zohoBeans)

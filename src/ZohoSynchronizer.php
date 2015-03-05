@@ -7,7 +7,8 @@ use Wabel\Zoho\CRM\ZohoBeanInterface;
 /**
  * This class is in charge of synchronizing one table of your database with Zoho records.
  */
-class ZohoSynchronizer {
+class ZohoSynchronizer
+{
 
     /**
      * @var AbstractZohoDao
@@ -19,9 +20,8 @@ class ZohoSynchronizer {
      */
     private $mapper;
 
-
     /**
-     * @param AbstractZohoDao $dao The DAO to synchronize
+     * @param AbstractZohoDao  $dao    The DAO to synchronize
      * @param MappingInterface $mapper The mapper used for the synchronization
      */
     public function __construct(AbstractZohoDao $dao, MappingInterface $mapper)
@@ -33,14 +33,16 @@ class ZohoSynchronizer {
     /**
      * Syncs all records between Zoho and your application.
      */
-    public function sync() {
+    public function sync()
+    {
         $this->sendAppBeansToZoho();
     }
 
     /**
      * Sends modified beans to Zoho.
      */
-    protected function sendAppBeansToZoho() {
+    protected function sendAppBeansToZoho()
+    {
         // TODO: fix the date!
         $contactAppBeans = $this->mapper->getBeansToSynchronize();
 

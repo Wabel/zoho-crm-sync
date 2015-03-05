@@ -1,7 +1,8 @@
 <?php
 namespace Wabel\Zoho\CRM\Sync;
 
-class ContactApplicationBean {
+class ContactApplicationBean
+{
 
     private $id;
     private $lastName;
@@ -11,7 +12,7 @@ class ContactApplicationBean {
     private $zohoId;
     private $zohoLastModificationDate;
 
-    function __construct($id = null, $lastName = null, $firstName = null, $email = null, $phone = null, $zohoId = null, $zohoLastModificationDate = null)
+    public function __construct($id = null, $lastName = null, $firstName = null, $email = null, $phone = null, $zohoId = null, $zohoLastModificationDate = null)
     {
         $this->id = $id;
         $this->lastName = $lastName;
@@ -133,6 +134,4 @@ class ContactApplicationBean {
     {
         $this->zohoLastModificationDate = $zohoLastModificationDate;
     }
-
-
 }

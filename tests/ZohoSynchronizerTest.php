@@ -8,9 +8,11 @@ use TestNamespace\ContactZohoDao;
 use Wabel\Zoho\CRM\Service\EntitiesGeneratorService;
 use Wabel\Zoho\CRM\ZohoClient;
 
-class ZohoSynchronizerTest extends \PHPUnit_Framework_TestCase {
+class ZohoSynchronizerTest extends \PHPUnit_Framework_TestCase
+{
 
-    public function getZohoClient() {
+    public function getZohoClient()
+    {
         return new ZohoClient($GLOBALS['auth_token']);
     }
 
@@ -19,12 +21,13 @@ class ZohoSynchronizerTest extends \PHPUnit_Framework_TestCase {
         return new EntitiesGeneratorService($this->getZohoClient());
     }
 
-    public function testSync() {
+    public function testSync()
+    {
         $generator = $this->getEntitiesGeneratorService();
         $generator->generateModule('Contacts', 'Contacts', 'Contact', __DIR__.'/generated/', 'TestNamespace');
 
-        require(__DIR__.'/generated/Contact.php');
-        require(__DIR__.'/generated/ContactZohoDao.php');
+        require __DIR__.'/generated/Contact.php';
+        require __DIR__.'/generated/ContactZohoDao.php';
 
         $contactZohoDao = new ContactZohoDao($this->getZohoClient());
 
@@ -38,7 +41,6 @@ class ZohoSynchronizerTest extends \PHPUnit_Framework_TestCase {
 
         $mapper = new ContactMapper();
         $mapper->setTestContacts($contacts);
-
 
         // Let's start by removing past inserted clients:
         $pastContacts = $contactZohoDao->searchRecords('(First Name:Test)');
