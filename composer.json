@@ -1,5 +1,5 @@
 {
-	"name" : "Wabel/zoho-crm-sync",
+	"name" : "wabel/zoho-crm-sync",
 	"description" : "This package contains code to help you synchronize ZohoCRM records with your database. ",
 	"type" : "library",
 	"homepage" : "http://mouf-php.com",
