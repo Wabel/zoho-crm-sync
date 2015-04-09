@@ -108,4 +108,9 @@ class ContactMapper implements MappingInterface
     {
         return $zohoBeans;
     }
+
+    public function getLastZohoModificationDate() {
+        $now = new \DateTime();
+        return $now->sub(new \DateInterval("P1D"));
+    }
 }

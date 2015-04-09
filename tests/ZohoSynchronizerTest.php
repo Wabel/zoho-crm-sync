@@ -48,14 +48,38 @@ class ZohoSynchronizerTest extends \PHPUnit_Framework_TestCase
             $contactZohoDao->delete($pastContact->getZohoId());
         }
 
+        // Before calling sync, let's input some test data to sync!
+        $contactBean = new \TestNamespace\Contact();
+        $contactBean->setFirstName("Test");
+        $contactBean->setLastName("InZohoFirst");
+        $contactZohoDao->save($contactBean);
+
+        // Let's wait for the sync of our Zoho user.
+        sleep(120);
+
         $zohoSynchronizer = new ZohoSynchronizer($contactZohoDao, $mapper);
 
-        $zohoSynchronizer->sync();
+        $appBeans = $zohoSynchronizer->getZohoBeansInApp();
+
+        $found = false;
+        foreach ($appBeans as $appBean) {
+            $this->assertInstanceOf("Wabel\\Zoho\\CRM\\Sync\\ContactApplicationBean");
+            if ($appBean->getLastName() == 'InZohoFirst') {
+                $found = true;
+            }
+        }
+        if (!$found) {
+            $this->fail('Could not find bean from Zoho in app.');
+        }
+
+
+        $zohoSynchronizer->sendAppBeansToZoho();
+
 
         sleep(120);
 
         $newContacts = $contactZohoDao->searchRecords('(First Name:Test)');
-        $this->assertCount(5, $newContacts);
+        $this->assertCount(6, $newContacts);
         // The ZohoID should be set in all fields:
         foreach ($contacts as $contact) {
             $this->assertNotEmpty($contact->getZohoId());

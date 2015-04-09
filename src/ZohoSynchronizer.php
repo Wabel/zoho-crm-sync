@@ -32,32 +32,49 @@ class ZohoSynchronizer
 
     /**
      * Syncs all records between Zoho and your application.
+     *
+     * This will call both "getZohoBeansInApp" and "sendAppBeansToZoho"
      */
     public function sync()
     {
+        $this->getZohoBeansInApp();
         $this->sendAppBeansToZoho();
     }
 
     /**
      * Sends modified beans to Zoho.
      */
-    protected function sendAppBeansToZoho()
+    public function sendAppBeansToZoho()
     {
         // TODO: fix the date!
-        $contactAppBeans = $this->mapper->getBeansToSynchronize();
+        $appBeans = $this->mapper->getBeansToSynchronize();
 
-        $contactZohoBeans = array_map(array($this->mapper, "toZohoBean"), $contactAppBeans);
-        /* @var $contactZohoBeans ZohoBeanInterface[] */
+        $zohoBeans = array_map(array($this->mapper, "toZohoBean"), $appBeans);
+        /* @var $zohoBeans ZohoBeanInterface[] */
 
-        $this->dao->save($contactZohoBeans);
+        $this->dao->save($zohoBeans);
 
-        foreach ($contactAppBeans as $key => $contactAppBean) {
-            $contactZohoBean = $contactZohoBeans[$key];
-            $modifiedTime = $contactZohoBean->getModifiedTime();
+        foreach ($appBeans as $key => $appBean) {
+            $zohoBean = $zohoBeans[$key];
+            $modifiedTime = $zohoBean->getModifiedTime();
             if ($modifiedTime === null) {
-                $modifiedTime = $contactZohoBean->getCreatedTime();
+                $modifiedTime = $zohoBean->getCreatedTime();
             }
-            $this->mapper->onSyncToZohoComplete($contactAppBean, $contactZohoBean->getZohoId(), $modifiedTime);
+            $this->mapper->onSyncToZohoComplete($appBean, $zohoBean->getZohoId(), $modifiedTime);
         }
+    }
+
+    /**
+     * Gets modified bean from Zoho into the application.
+     */
+    public function getZohoBeansInApp() {
+
+        $lastZohoModificationDate = $this->mapper->getLastZohoModificationDate();
+
+        $zohoBeans = $this->dao->searchRecords(null, 1, null, $lastZohoModificationDate);
+
+        $appBeans = array_map(array($this->mapper, "toApplicationBean"), $zohoBeans);
+
+        return $appBeans;
     }
 }
