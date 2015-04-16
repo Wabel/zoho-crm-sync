@@ -5,8 +5,6 @@
 Wabel's Zoho-CRM Synchronizer
 =============================
 
-Work in progress.
-
 What is this?
 -------------
 
