@@ -98,17 +98,13 @@ class ContactMapper implements MappingInterface
     }
 
     /**
-     * Filters the list of Zoho beans to store in database.
+     * This function should return the last Zoho modification date of a record saved in YOUR database.
+     * The date must be returned as a \DateTime object.
+     * Note: when a Zoho bean is inserted, the last modification date is passed to the `onSyncToZohoComplete`.
+     * You should store that date in the database.
      *
-     *
-     * @param  array $zohoBeans
-     * @return array The filtered list of Zoho beans.
+     * @return \DateTime
      */
-    public function filterZohoBeans(array $zohoBeans)
-    {
-        return $zohoBeans;
-    }
-
     public function getLastZohoModificationDate() {
         $now = new \DateTime();
         return $now->sub(new \DateInterval("P1D"));

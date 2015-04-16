@@ -111,7 +111,9 @@ class MyContactMapper implements MappingInterface {
             // This method will receive the Zoho bean from Zoho.
             // It should
             // 1- get the ZohoId (using $zohoBean->getZohoId() )
-            // 2- check in your database 
+            // 2- check in your database if a bean with this ZohoId exists or not
+            // 3-a- If the bean exists in database, merge the Zoho bean into the application bean
+            // 3-b- If the bean does not exist in database, create the application bean from the Zoho bean
         }
     
         /**
@@ -122,29 +124,21 @@ class MyContactMapper implements MappingInterface {
          */
         public function onSyncToZohoComplete($applicationBean, $zohoId, \DateTime $date)
         {
-            if (!$applicationBean instanceof ContactApplicationBean) {
-                throw new ZohoCRMException("Expected ContactApplicationBean");
-            }
-            $applicationBean->setZohoId($zohoId);
-            $applicationBean->setZohoLastModificationDate($date);
+            // This function is called after an application bean has been stored into Zoho.
+            // Zoho returns a ZohoID, and a modification time. You must store both information in the application bean.
         }
-    
     
         /**
-         * Filters the list of Zoho beans to store in database.
+         * This function should return the last Zoho modification date of a record saved in YOUR database.
+         * The date must be returned as a \DateTime object.
+         * Note: when a Zoho bean is inserted, the last modification date is passed to the `onSyncToZohoComplete`.
+         * You should store that date in the database.
          *
-         *
-         * @param  array $zohoBeans
-         * @return array The filtered list of Zoho beans.
+         * @return \DateTime
          */
-        public function filterZohoBeans(array $zohoBeans)
-        {
-            return $zohoBeans;
-        }
-    
         public function getLastZohoModificationDate() {
-            $now = new \DateTime();
-            return $now->sub(new \DateInterval("P1D"));
+            // You should perform a query in your database and return the "max" modification date
+            // stored into your application bean table.
         }
 
 }

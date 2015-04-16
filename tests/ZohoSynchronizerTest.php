@@ -4,6 +4,7 @@ namespace Wabel\Zoho\CRM\Sync;
 require 'ContactApplicationBean.php';
 require 'ContactMapper.php';
 
+use Psr\Log\NullLogger;
 use TestNamespace\ContactZohoDao;
 use Wabel\Zoho\CRM\Service\EntitiesGeneratorService;
 use Wabel\Zoho\CRM\ZohoClient;
@@ -18,8 +19,10 @@ class ZohoSynchronizerTest extends \PHPUnit_Framework_TestCase
 
     public function getEntitiesGeneratorService()
     {
-        return new EntitiesGeneratorService($this->getZohoClient());
+        return new EntitiesGeneratorService($this->getZohoClient(), new NullLogger());
     }
+
+    protected $firstName;
 
     public function testSync()
     {
@@ -30,27 +33,29 @@ class ZohoSynchronizerTest extends \PHPUnit_Framework_TestCase
         require __DIR__.'/generated/ContactZohoDao.php';
 
         $contactZohoDao = new ContactZohoDao($this->getZohoClient());
+        $firstName = uniqid("Test");
+        $this->firstName = $firstName;
 
         $contacts = [
-            new ContactApplicationBean(1, "Test1", "Test", "test@yopmail.com", "0123456789"),
-            new ContactApplicationBean(2, "Test2", "Test", "test2@yopmail.com", "0123456789"),
-            new ContactApplicationBean(3, "Test3", "Test", "test3@yopmail.com", "0123456789"),
-            new ContactApplicationBean(4, "Test4", "Test", "test4@yopmail.com", "0123456789"),
-            new ContactApplicationBean(5, "Test5", "Test", "test5@yopmail.com", "0123456789"),
+            new ContactApplicationBean(1, "Test1", $firstName, "test@yopmail.com", "0123456789"),
+            new ContactApplicationBean(2, "Test2", $firstName, "test2@yopmail.com", "0123456789"),
+            new ContactApplicationBean(3, "Test3", $firstName, "test3@yopmail.com", "0123456789"),
+            new ContactApplicationBean(4, "Test4", $firstName, "test4@yopmail.com", "0123456789"),
+            new ContactApplicationBean(5, "Test5", $firstName, "test5@yopmail.com", "0123456789"),
         ];
 
         $mapper = new ContactMapper();
         $mapper->setTestContacts($contacts);
 
         // Let's start by removing past inserted clients:
-        $pastContacts = $contactZohoDao->searchRecords('(First Name:Test)');
+        $pastContacts = $contactZohoDao->searchRecords('(First Name:'.$firstName.')');
         foreach ($pastContacts as $pastContact) {
             $contactZohoDao->delete($pastContact->getZohoId());
         }
 
         // Before calling sync, let's input some test data to sync!
         $contactBean = new \TestNamespace\Contact();
-        $contactBean->setFirstName("Test");
+        $contactBean->setFirstName($firstName);
         $contactBean->setLastName("InZohoFirst");
         $contactZohoDao->save($contactBean);
 
@@ -63,7 +68,7 @@ class ZohoSynchronizerTest extends \PHPUnit_Framework_TestCase
 
         $found = false;
         foreach ($appBeans as $appBean) {
-            $this->assertInstanceOf("Wabel\\Zoho\\CRM\\Sync\\ContactApplicationBean");
+            $this->assertInstanceOf("Wabel\\Zoho\\CRM\\Sync\\ContactApplicationBean", $appBean);
             if ($appBean->getLastName() == 'InZohoFirst') {
                 $found = true;
             }
@@ -78,11 +83,21 @@ class ZohoSynchronizerTest extends \PHPUnit_Framework_TestCase
 
         sleep(120);
 
-        $newContacts = $contactZohoDao->searchRecords('(First Name:Test)');
+        $newContacts = $contactZohoDao->searchRecords('(First Name:'.$firstName.')');
         $this->assertCount(6, $newContacts);
         // The ZohoID should be set in all fields:
-        foreach ($contacts as $contact) {
+        foreach ($newContacts as $contact) {
             $this->assertNotEmpty($contact->getZohoId());
+        }
+    }
+
+    protected function tearDown()
+    {
+        $contactZohoDao = new ContactZohoDao($this->getZohoClient());
+        // Let's end by removing past inserted clients:
+        $pastContacts = $contactZohoDao->searchRecords('(First Name:'.$this->firstName.')');
+        foreach ($pastContacts as $pastContact) {
+            $contactZohoDao->delete($pastContact->getZohoId());
         }
     }
 }

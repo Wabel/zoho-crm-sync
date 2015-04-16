@@ -46,7 +46,6 @@ class ZohoSynchronizer
      */
     public function sendAppBeansToZoho()
     {
-        // TODO: fix the date!
         $appBeans = $this->mapper->getBeansToSynchronize();
 
         $zohoBeans = array_map(array($this->mapper, "toZohoBean"), $appBeans);
@@ -65,13 +64,13 @@ class ZohoSynchronizer
     }
 
     /**
-     * Gets modified bean from Zoho into the application.
+     * Gets modified beans from Zoho into the application.
      */
     public function getZohoBeansInApp() {
 
         $lastZohoModificationDate = $this->mapper->getLastZohoModificationDate();
 
-        $zohoBeans = $this->dao->searchRecords(null, 1, null, $lastZohoModificationDate);
+        $zohoBeans = $this->dao->getRecords(null, null, $lastZohoModificationDate);
 
         $appBeans = array_map(array($this->mapper, "toApplicationBean"), $zohoBeans);
 

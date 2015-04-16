@@ -44,15 +44,6 @@ interface MappingInterface
     public function getBeansToSynchronize();
 
     /**
-     * Filters the list of Zoho beans to store in database.
-     *
-     *
-     * @param  ZohoBeanInterface[] $zohoBeans
-     * @return ZohoBeanInterface[] The filtered list of Zoho beans.
-     */
-    public function filterZohoBeans(array $zohoBeans);
-
-    /**
      * This function should return the last Zoho modification date of a record saved in YOUR database.
      * The date must be returned as a \DateTime object.
      * Note: when a Zoho bean is inserted, the last modification date is passed to the `onSyncToZohoComplete`.
