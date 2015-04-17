@@ -48,7 +48,9 @@ class ZohoSynchronizer
     {
         $appBeans = $this->mapper->getBeansToSynchronize();
 
-        $zohoBeans = array_map(array($this->mapper, "toZohoBean"), $appBeans);
+        foreach($appBeans as $appBean) {
+            $zohoBeans[] = $this->mapper->toZohoBean($appBean);
+        }
         /* @var $zohoBeans ZohoBeanInterface[] */
 
         $this->dao->save($zohoBeans);
