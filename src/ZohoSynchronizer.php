@@ -1,6 +1,8 @@
 <?php
 namespace Wabel\Zoho\CRM\Sync;
 
+use Mouf\Mvc\Splash\HtmlResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Wabel\Zoho\CRM\AbstractZohoDao;
 use Wabel\Zoho\CRM\ZohoBeanInterface;
 
@@ -34,19 +36,24 @@ class ZohoSynchronizer
      * Syncs all records between Zoho and your application.
      *
      * This will call both "getZohoBeansInApp" and "sendAppBeansToZoho"
+     * @return int Number of records sent to Zoho
      */
     public function sync()
     {
         $this->getZohoBeansInApp();
-        $this->sendAppBeansToZoho();
+        return $this->sendAppBeansToZoho();
     }
 
     /**
      * Sends modified beans to Zoho.
+     * @return int Number of records synchronized
      */
     public function sendAppBeansToZoho()
     {
         $appBeans = $this->mapper->getBeansToSynchronize();
+        if(!count($appBeans)) {
+            return 0;
+        }
 
         foreach($appBeans as $appBean) {
             $zohoBeans[] = $this->mapper->toZohoBean($appBean);
@@ -63,6 +70,8 @@ class ZohoSynchronizer
             }
             $this->mapper->onSyncToZohoComplete($appBean, $zohoBean->getZohoId(), $modifiedTime);
         }
+
+        return count($appBeans);
     }
 
     /**
