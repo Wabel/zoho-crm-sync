@@ -115,15 +115,25 @@ class MyContactMapper implements MappingInterface {
         }
     
         /**
-         * Stores the ZohoID in the bean passed in parameter.
+         * Function called when an application bean was successfully stored in Zoho.
+         * Used to store the ZohoID and last modification date in the bean passed in parameter.
          *
-         * @param object $applicationBean
-         * @param string $zohoId
+         * Note: in case an update is performed and the ZohoID stored in app does no more exists
+         * in Zoho (for instance if the record has been deleted in Zoho), the $zohoId and the
+         * $modificationDate will be null.
+         *
+         * @param object    $applicationBean
+         * @param string    $zohoId
+         * @param \DateTime $modificationDate
          */
-        public function onSyncToZohoComplete($applicationBean, $zohoId, \DateTime $date)
+        public function onSyncToZohoComplete($applicationBean, $zohoId, \DateTime $modificationDate)
         {
             // This function is called after an application bean has been stored into Zoho.
             // Zoho returns a ZohoID, and a modification time. You must store both information in the application bean.
+            
+            // Note: if $zohoId and $modificationDate is null, it means the ZohoID that was stored on the
+            // application side is no more valid (either because the record has been deleted in Zoho or has been
+            // merged)
         }
     
         /**

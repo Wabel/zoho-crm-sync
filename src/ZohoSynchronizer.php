@@ -4,6 +4,7 @@ namespace Wabel\Zoho\CRM\Sync;
 use Mouf\Mvc\Splash\HtmlResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Wabel\Zoho\CRM\AbstractZohoDao;
+use Wabel\Zoho\CRM\Exception\ZohoCRMUpdateException;
 use Wabel\Zoho\CRM\ZohoBeanInterface;
 
 /**
@@ -60,15 +61,28 @@ class ZohoSynchronizer
         }
         /* @var $zohoBeans ZohoBeanInterface[] */
 
-        $this->dao->save($zohoBeans);
+        $failedBeans = new \SplObjectStorage();
+        try  {
+            $this->dao->save($zohoBeans);
+        } catch (ZohoCRMUpdateException $updateException) {
+            $failedBeans = $updateException->getFailedBeans();
+        }
 
         foreach ($appBeans as $key => $appBean) {
             $zohoBean = $zohoBeans[$key];
-            $modifiedTime = $zohoBean->getModifiedTime();
-            if ($modifiedTime === null) {
-                $modifiedTime = $zohoBean->getCreatedTime();
+
+            if ($failedBeans->offsetExists($zohoBean)) {
+                $zohoId = null;
+                $modifiedTime = null;
+            } else {
+                $modifiedTime = $zohoBean->getModifiedTime();
+                if ($modifiedTime === null) {
+                    $modifiedTime = $zohoBean->getCreatedTime();
+                }
+                $zohoId = $zohoBean->getZohoId();
             }
-            $this->mapper->onSyncToZohoComplete($appBean, $zohoBean->getZohoId(), $modifiedTime);
+
+            $this->mapper->onSyncToZohoComplete($appBean, $zohoId, $modifiedTime);
         }
 
         return count($appBeans);

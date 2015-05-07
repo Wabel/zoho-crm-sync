@@ -27,14 +27,18 @@ interface MappingInterface
     public function toApplicationBean(ZohoBeanInterface $zohoBean);
 
     /**
-     * Function called when an application bean was succcessfully stored in Zoho.
+     * Function called when an application bean was successfully stored in Zoho.
      * Used to store the ZohoID and last modification date in the bean passed in parameter.
+     *
+     * Note: in case an update is performed and the ZohoID stored in app does no more exists
+     * in Zoho (for instance if the record has been deleted in Zoho), the $zohoId and the
+     * $modificationDate will be null.
      *
      * @param object    $applicationBean
      * @param string    $zohoId
      * @param \DateTime $modificationDate
      */
-    public function onSyncToZohoComplete($applicationBean, $zohoId, \DateTime $modificationDate);
+    public function onSyncToZohoComplete($applicationBean, $zohoId, \DateTime $modificationDate = null);
 
     /**
      * Returns an array of application beans that have been modified since the last synchronisation with Zoho.
