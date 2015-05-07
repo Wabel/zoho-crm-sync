@@ -1,8 +1,6 @@
 <?php
 namespace Wabel\Zoho\CRM\Sync;
 
-use Mouf\Mvc\Splash\HtmlResponse;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Wabel\Zoho\CRM\AbstractZohoDao;
 use Wabel\Zoho\CRM\Exception\ZohoCRMUpdateException;
 use Wabel\Zoho\CRM\ZohoBeanInterface;
@@ -42,6 +40,7 @@ class ZohoSynchronizer
     public function sync()
     {
         $this->getZohoBeansInApp();
+
         return $this->sendAppBeansToZoho();
     }
 
@@ -52,17 +51,17 @@ class ZohoSynchronizer
     public function sendAppBeansToZoho()
     {
         $appBeans = $this->mapper->getBeansToSynchronize();
-        if(!count($appBeans)) {
+        if (!count($appBeans)) {
             return 0;
         }
 
-        foreach($appBeans as $appBean) {
+        foreach ($appBeans as $appBean) {
             $zohoBeans[] = $this->mapper->toZohoBean($appBean);
         }
         /* @var $zohoBeans ZohoBeanInterface[] */
 
         $failedBeans = new \SplObjectStorage();
-        try  {
+        try {
             $this->dao->save($zohoBeans);
         } catch (ZohoCRMUpdateException $updateException) {
             $failedBeans = $updateException->getFailedBeans();
@@ -91,8 +90,8 @@ class ZohoSynchronizer
     /**
      * Gets modified beans from Zoho into the application.
      */
-    public function getZohoBeansInApp() {
-
+    public function getZohoBeansInApp()
+    {
         $lastZohoModificationDate = $this->mapper->getLastZohoModificationDate();
 
         $zohoBeans = $this->dao->getRecords(null, null, $lastZohoModificationDate);
