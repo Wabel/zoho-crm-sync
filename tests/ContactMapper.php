@@ -78,7 +78,7 @@ class ContactMapper implements MappingInterface
      * @param object $applicationBean
      * @param string $zohoId
      */
-    public function onSyncToZohoComplete($applicationBean, $zohoId, \DateTime $date)
+    public function onSyncToZohoComplete($applicationBean, $zohoId, \DateTime $date = null)
     {
         if (!$applicationBean instanceof ContactApplicationBean) {
             throw new ZohoCRMException("Expected ContactApplicationBean");
