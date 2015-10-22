@@ -1,6 +1,7 @@
 <?php
 namespace Wabel\Zoho\CRM\Sync;
 
+use Wabel\Zoho\CRM\Exception\ZohoCRMException;
 use Wabel\Zoho\CRM\ZohoBeanInterface;
 
 /**
@@ -30,10 +31,6 @@ interface MappingInterface
      * Function called when an application bean was successfully stored in Zoho.
      * Used to store the ZohoID and last modification date in the bean passed in parameter.
      *
-     * Note: in case an update is performed and the ZohoID stored in app does no more exists
-     * in Zoho (for instance if the record has been deleted in Zoho), the $zohoId and the
-     * $modificationDate will be null.
-     *
      * @param object    $applicationBean
      * @param string    $zohoId
      * @param \DateTime $modificationDate
@@ -56,4 +53,29 @@ interface MappingInterface
      * @return \DateTime
      */
     public function getLastZohoModificationDate();
+
+    /**
+     * Function called when an application bean was deleted in Zoho.
+     *
+     * @param string $zohoId
+     */
+    public function onDeletedInZoho($zohoId);
+
+    /**
+     * Function called when an error was thrown by Zoho while trying to update a record.
+     *
+     * @param object $applicationBean
+     * @param string $zohoId
+     * @param ZohoCRMException $exception The exception representing the error regarding this record.
+     */
+    public function onSyncToZohoError($applicationBean, $zohoId, ZohoCRMException $exception);
+
+    /**
+     * Function called when the record in Zoho was merged with another record. Unfortunately, there is no way to
+     * return the new ZohoId.
+     *
+     * @param object $applicationBean
+     * @param string $zohoId
+     */
+    public function onContactMerged($applicationBean, $zohoId);
 }

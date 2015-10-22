@@ -109,4 +109,38 @@ class ContactMapper implements MappingInterface
         $now = new \DateTime();
         return $now->sub(new \DateInterval("P1D"));
     }
+
+    /**
+     * Function called when an application bean was deleted in Zoho.
+     *
+     * @param string $zohoId
+     */
+    public function onDeletedInZoho($zohoId)
+    {
+        // Does nothing
+    }
+
+    /**
+     * Function called when an error was thrown by Zoho while trying to update a record.
+     *
+     * @param object $applicationBean
+     * @param string $zohoId
+     * @param ZohoCRMException $exception The exception representing the error regarding this record.
+     */
+    public function onSyncToZohoError($applicationBean, $zohoId, ZohoCRMException $exception)
+    {
+        // Does nothing
+    }
+
+    /**
+     * Function called when the record in Zoho was merged with another record. Unfortunately, there is no way to
+     * return the new ZohoId.
+     *
+     * @param object $applicationBean
+     * @param string $zohoId
+     */
+    public function onContactMerged($applicationBean, $zohoId)
+    {
+        // Does nothing
+    }
 }

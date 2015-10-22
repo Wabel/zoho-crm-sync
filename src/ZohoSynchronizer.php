@@ -2,6 +2,7 @@
 namespace Wabel\Zoho\CRM\Sync;
 
 use Wabel\Zoho\CRM\AbstractZohoDao;
+use Wabel\Zoho\CRM\Exception\ZohoCRMException;
 use Wabel\Zoho\CRM\Exception\ZohoCRMUpdateException;
 use Wabel\Zoho\CRM\ZohoBeanInterface;
 
@@ -39,7 +40,10 @@ class ZohoSynchronizer
      */
     public function sync()
     {
-        $this->getZohoBeansInApp();
+        $lastZohoModificationDate = $this->mapper->getLastZohoModificationDate();
+
+        $this->getZohoBeansInApp($lastZohoModificationDate);
+        $this->processDeletedZohoBeans($lastZohoModificationDate);
 
         return $this->sendAppBeansToZoho();
     }
@@ -70,18 +74,22 @@ class ZohoSynchronizer
         foreach ($appBeans as $key => $appBean) {
             $zohoBean = $zohoBeans[$key];
 
+            $zohoId = $zohoBean->getZohoId();
+
             if ($failedBeans->offsetExists($zohoBean)) {
-                $zohoId = null;
-                $modifiedTime = null;
+                $exception = $failedBeans->offsetGet($zohoBean);
+                if ($exception->getZohoCode() == '401.2') {
+                    $this->mapper->onContactMerged($appBean, $zohoId);
+                } else {
+                    $this->mapper->onSyncToZohoError($appBean, $zohoId, $exception);
+                }
             } else {
                 $modifiedTime = $zohoBean->getModifiedTime();
                 if ($modifiedTime === null) {
                     $modifiedTime = $zohoBean->getCreatedTime();
                 }
-                $zohoId = $zohoBean->getZohoId();
+                $this->mapper->onSyncToZohoComplete($appBean, $zohoId, $modifiedTime);
             }
-
-            $this->mapper->onSyncToZohoComplete($appBean, $zohoId, $modifiedTime);
         }
 
         return count($appBeans);
@@ -89,15 +97,40 @@ class ZohoSynchronizer
 
     /**
      * Gets modified beans from Zoho into the application.
+     * @param \DateTimeInterface $lastZohoModificationDate
+     * @return array
+     * @throws \Exception
+     * @throws \Wabel\Zoho\CRM\Exception\ZohoCRMResponseException
      */
-    public function getZohoBeansInApp()
+    public function getZohoBeansInApp(\DateTimeInterface $lastZohoModificationDate = null)
     {
-        $lastZohoModificationDate = $this->mapper->getLastZohoModificationDate();
+        if ($lastZohoModificationDate === null) {
+            $lastZohoModificationDate = $this->mapper->getLastZohoModificationDate();
+        }
 
         $zohoBeans = $this->dao->getRecords(null, null, $lastZohoModificationDate);
 
         $appBeans = array_map(array($this->mapper, "toApplicationBean"), $zohoBeans);
 
         return $appBeans;
+    }
+
+    /**
+     * Processes beans removed from Zoho in the application.
+     * @param \DateTimeInterface $lastZohoModificationDate
+     * @throws \Exception
+     * @throws \Wabel\Zoho\CRM\Exception\ZohoCRMResponseException
+     */
+    public function processDeletedZohoBeans(\DateTimeInterface $lastZohoModificationDate = null)
+    {
+        if ($lastZohoModificationDate === null) {
+            $lastZohoModificationDate = $this->mapper->getLastZohoModificationDate();
+        }
+
+        $deletedRecordIds = $this->dao->getDeletedRecordIds($lastZohoModificationDate);
+
+        foreach ($deletedRecordIds as $deletedZohoId) {
+            $this->mapper->onDeletedInZoho($deletedZohoId);
+        }
     }
 }
