@@ -78,7 +78,7 @@ class ZohoSynchronizer
 
             if ($failedBeans->offsetExists($zohoBean)) {
                 $exception = $failedBeans->offsetGet($zohoBean);
-                if ($exception->getCode() == '401.2') {
+                if ($exception->getZohoCode() == '401.2') {
                     $this->mapper->onContactMerged($appBean, $zohoId);
                 } else {
                     $this->mapper->onSyncToZohoError($appBean, $zohoId, $exception);
