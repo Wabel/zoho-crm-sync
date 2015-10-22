@@ -43,6 +43,7 @@ class ZohoSynchronizer
         $lastZohoModificationDate = $this->mapper->getLastZohoModificationDate();
 
         $this->getZohoBeansInApp($lastZohoModificationDate);
+        $this->processDeletedZohoBeans($lastZohoModificationDate);
 
         return $this->sendAppBeansToZoho();
     }
