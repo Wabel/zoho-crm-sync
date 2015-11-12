@@ -77,5 +77,5 @@ interface MappingInterface
      * @param object $applicationBean
      * @param string $zohoId
      */
-    public function onContactMerged($applicationBean, $zohoId);
+    public function onMerged($applicationBean, $zohoId);
 }
